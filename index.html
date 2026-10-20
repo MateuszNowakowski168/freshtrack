@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7ef">
+  <title>FreshTrack — mniej marnowania</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="FreshTrack — strona główna">
+        <span class="brand-mark">✳</span>
+        <span>fresh<span class="brand-light">track</span></span>
+      </a>
+      <div class="sidebar-label">MENU</div>
+      <button class="nav-item active" data-view="all"><span>▦</span> Wszystkie produkty <span class="nav-count" id="navAllCount">0</span></button>
+      <button class="nav-item" data-view="soon"><span>◷</span> Do zużycia wkrótce</button>
+      <button class="nav-item" data-view="expired"><span>!</span> Po terminie</button>
+      <button class="nav-item" data-view="used"><span>✓</span> Zużyte produkty</button>
+      <div class="sidebar-bottom">
+        <div class="tip-icon">♧</div>
+        <strong>Dobre nawyki, małe zmiany</strong>
+        <p>Każdy produkt, który wykorzystasz na czas, to mniej zmarnowanego jedzenia.</p>
+        <div class="progress-track"><div id="impactBar" class="progress-fill"></div></div>
+        <small id="impactText">Zacznij od dodania produktu</small>
+      </div>
+      <div class="sidebar-footer">Twoja kuchnia, pod kontrolą 🌱</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">TWOJA SPIŻARNIA</div>
+          <h1 id="pageTitle">Wszystkie produkty</h1>
+          <p class="subtitle" id="pageSubtitle">Miej terminy pod kontrolą i marnuj mniej.</p>
+        </div>
+        <button class="primary-btn" id="openAdd"><span class="plus">＋</span> Dodaj produkt</button>
+      </header>
+
+      <section class="welcome-banner">
+        <div class="welcome-copy">
+          <div class="banner-kicker">MAŁE KROKI MAJĄ ZNACZENIE</div>
+          <h2>Najpierw zjedz.<br><span>Potem kupuj.</span></h2>
+          <p>Sprawdź, co czeka w lodówce i zaplanuj posiłki tak, żeby nic się nie zmarnowało.</p>
+          <button class="banner-btn" id="seeSoon">Zobacz, co zużyć <span>→</span></button>
+        </div>
+        <div class="banner-art" aria-hidden="true">
+          <div class="sun"></div>
+          <div class="leaf leaf-one"></div><div class="leaf leaf-two"></div>
+          <div class="produce produce-apple">●</div>
+          <div class="produce produce-orange">●</div>
+          <div class="produce produce-leaf">✦</div>
+          <div class="art-caption">ŚWIEŻO I ŚWIADOMIE</div>
+        </div>
+      </section>
+
+      <section class="stats-grid" aria-label="Podsumowanie produktów">
+        <article class="stat-card"><div class="stat-top"><span>Wszystkie produkty</span><span class="stat-icon green">▦</span></div><div class="stat-number" id="statAll">0</div><div class="stat-note">w Twojej spiżarni</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Zużyj wkrótce</span><span class="stat-icon amber">◷</span></div><div class="stat-number" id="statSoon">0</div><div class="stat-note">kończy się termin</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Po terminie</span><span class="stat-icon red">!</span></div><div class="stat-number" id="statExpired">0</div><div class="stat-note">sprawdź przed użyciem</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Uratowane produkty</span><span class="stat-icon green">♡</span></div><div class="stat-number" id="statUsed">0</div><div class="stat-note">oznaczone jako zużyte</div></article>
+      </section>
+
+      <section class="products-section">
+        <div class="section-heading">
+          <div><h2 id="listHeading">Twoje produkty</h2><p id="listDescription">Najbliższe terminy na samej górze.</p></div>
+          <div class="toolbar">
+            <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Szukaj produktu..." aria-label="Szukaj produktu"></label>
+            <select id="categoryFilter" aria-label="Filtr kategorii"><option value="all">Wszystkie kategorie</option><option>Nabiał</option><option>Owoce i warzywa</option><option>Mięso i ryby</option><option>Pieczywo</option><option>Produkty suche</option><option>Mrożonki</option><option>Napoje</option><option>Inne</option></select>
+          </div>
+        </div>
+        <div class="product-list" id="productList"></div>
+        <div class="empty-state hidden" id="emptyState">
+          <div class="empty-illustration">🥬</div>
+          <h3>Tu na razie jest świeżo i pusto</h3>
+          <p>Dodaj pierwszy produkt, a pomożemy Ci pilnować jego terminu.</p>
+          <button class="primary-btn" id="emptyAdd">＋ Dodaj pierwszy produkt</button>
+        </div>
+      </section>
+      <footer class="main-footer"><span>FreshTrack <span class="dot">●</span> mniej marnowania, więcej smaku</span><button id="exportBtn" class="text-btn">Eksportuj dane ↗</button></footer>
+    </main>
+  </div>
+
+  <dialog id="productDialog" class="modal">
+    <form id="productForm">
+      <div class="modal-head"><div><div class="eyebrow">TWOJA SPIŻARNIA</div><h2 id="modalTitle">Dodaj produkt</h2></div><button type="button" class="close-btn" id="closeModal" aria-label="Zamknij">×</button></div>
+      <input type="hidden" id="productId">
+      <label class="field-label" for="productName">Nazwa produktu *</label>
+      <input id="productName" name="name" required maxlength="80" placeholder="np. Jogurt naturalny">
+      <div class="form-row">
+        <div><label class="field-label" for="productDate">Data ważności *</label><input id="productDate" name="date" type="date" required></div>
+        <div><label class="field-label" for="productQty">Ilość</label><input id="productQty" name="qty" type="number" min="1" max="999" value="1" required></div>
+      </div>
+      <label class="field-label" for="productCategory">Kategoria</label>
+      <select id="productCategory" name="category"><option>Nabiał</option><option>Owoce i warzywa</option><option>Mięso i ryby</option><option>Pieczywo</option><option>Produkty suche</option><option>Mrożonki</option><option>Napoje</option><option>Inne</option></select>
+      <label class="field-label" for="productNotes">Notatka <span class="optional">(opcjonalnie)</span></label>
+      <textarea id="productNotes" name="notes" rows="2" maxlength="240" placeholder="np. otwarte, przechowywać w lodówce"></textarea>
+      <div class="modal-actions"><button type="button" class="secondary-btn" id="cancelModal">Anuluj</button><button type="submit" class="primary-btn">Zapisz produkt</button></div>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
