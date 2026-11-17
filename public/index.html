@@ -14,14 +14,11 @@
         <span class="brand-mark">✳</span>
         <span>fresh<span class="brand-light">track</span></span>
       </a>
-      <div class="sidebar-label">WIDOKI</div>
-      <nav class="sidebar-nav" aria-label="Nawigacja główna">
-        <button type="button" class="nav-item active" data-view="all" aria-current="page"><span aria-hidden="true">▦</span> Wszystkie produkty <span class="nav-count" id="navAllCount">0</span></button>
-        <button type="button" class="nav-item" data-view="soon"><span aria-hidden="true">◷</span> Do zużycia wkrótce</button>
-        <button type="button" class="nav-item" data-view="expired"><span aria-hidden="true">!</span> Po terminie</button>
-        <button type="button" class="nav-item" data-view="used"><span aria-hidden="true">✓</span> Zużyte produkty</button>
-        <button type="button" class="nav-item" data-view="recipes"><span aria-hidden="true">♨</span> Przepisy <span class="nav-count" id="navRecipeCount">0</span></button>
-      </nav>
+      <div class="sidebar-label">MENU</div>
+      <button class="nav-item active" data-view="all"><span>▦</span> Wszystkie produkty <span class="nav-count" id="navAllCount">0</span></button>
+      <button class="nav-item" data-view="soon"><span>◷</span> Do zużycia wkrótce</button>
+      <button class="nav-item" data-view="expired"><span>!</span> Po terminie</button>
+      <button class="nav-item" data-view="used"><span>✓</span> Zużyte produkty</button>
       <div class="sidebar-bottom">
         <div class="tip-icon">♧</div>
         <strong>Dobre nawyki, małe zmiany</strong>
@@ -39,15 +36,15 @@
           <h1 id="pageTitle">Wszystkie produkty</h1>
           <p class="subtitle" id="pageSubtitle">Miej terminy pod kontrolą i marnuj mniej.</p>
         </div>
-        <button type="button" class="primary-btn" id="openAdd"><span class="plus" aria-hidden="true">＋</span> Dodaj produkt</button>
+        <button class="primary-btn" id="openAdd"><span class="plus">＋</span> Dodaj produkt</button>
       </header>
 
-      <section class="welcome-banner" id="welcomeBanner">
+      <section class="welcome-banner">
         <div class="welcome-copy">
           <div class="banner-kicker">MAŁE KROKI MAJĄ ZNACZENIE</div>
-          <h2>Najpierw zużyj to,<br><span>co kończy się najprędzej.</span></h2>
-          <p>Produkty są uporządkowane według daty ważności. Te z terminem do 3 dni wyróżniamy na liście.</p>
-          <button type="button" class="banner-btn" id="seeSoon">Pokaż produkty do zużycia <span aria-hidden="true">→</span></button>
+          <h2>Najpierw zjedz.<br><span>Potem kupuj.</span></h2>
+          <p>Sprawdź, co czeka w lodówce i zaplanuj posiłki tak, żeby nic się nie zmarnowało.</p>
+          <button class="banner-btn" id="seeSoon">Zobacz, co zużyć <span>→</span></button>
         </div>
         <div class="banner-art" aria-hidden="true">
           <div class="sun"></div>
@@ -59,14 +56,14 @@
         </div>
       </section>
 
-      <section class="stats-grid" id="statsGrid" aria-label="Podsumowanie produktów">
+      <section class="stats-grid" aria-label="Podsumowanie produktów">
         <article class="stat-card"><div class="stat-top"><span>Wszystkie produkty</span><span class="stat-icon green">▦</span></div><div class="stat-number" id="statAll">0</div><div class="stat-note">w Twojej spiżarni</div></article>
         <article class="stat-card"><div class="stat-top"><span>Zużyj wkrótce</span><span class="stat-icon amber">◷</span></div><div class="stat-number" id="statSoon">0</div><div class="stat-note">kończy się termin</div></article>
         <article class="stat-card"><div class="stat-top"><span>Po terminie</span><span class="stat-icon red">!</span></div><div class="stat-number" id="statExpired">0</div><div class="stat-note">sprawdź przed użyciem</div></article>
         <article class="stat-card"><div class="stat-top"><span>Uratowane produkty</span><span class="stat-icon green">♡</span></div><div class="stat-number" id="statUsed">0</div><div class="stat-note">oznaczone jako zużyte</div></article>
       </section>
 
-      <section class="products-section" id="productsSection">
+      <section class="products-section">
         <div class="section-heading">
           <div><h2 id="listHeading">Twoje produkty</h2><p id="listDescription">Najbliższe terminy na samej górze.</p></div>
           <div class="toolbar">
@@ -74,45 +71,13 @@
             <select id="categoryFilter" aria-label="Filtr kategorii"><option value="all">Wszystkie kategorie</option><option>Nabiał</option><option>Owoce i warzywa</option><option>Mięso i ryby</option><option>Pieczywo</option><option>Produkty suche</option><option>Mrożonki</option><option>Napoje</option><option>Inne</option></select>
           </div>
         </div>
-        <div class="product-list" id="productList" role="list" aria-label="Lista produktów" aria-live="polite"></div>
+        <div class="product-list" id="productList"></div>
         <div class="empty-state hidden" id="emptyState">
           <div class="empty-illustration">🥬</div>
           <h3>Tu na razie jest świeżo i pusto</h3>
           <p>Dodaj pierwszy produkt, a pomożemy Ci pilnować jego terminu.</p>
           <button class="primary-btn" id="emptyAdd">＋ Dodaj pierwszy produkt</button>
         </div>
-      </section>
-      <section id="recipeSection" class="recipes-section hidden" aria-labelledby="recipesHeading">
-        <div class="section-heading recipe-heading">
-          <div>
-            <h2 id="recipesHeading">Przepisy z Twojej spiżarni</h2>
-            <p>Najpierw przepisy wykorzystujące produkty z najbliższym terminem.</p>
-          </div>
-          <span class="recipe-sort-note"><span aria-hidden="true">◷</span> Sortowane według daty ważności</span>
-        </div>
-        <form id="aiForm" class="ai-panel" aria-labelledby="aiHeading">
-          <div class="ai-panel-copy">
-            <span class="ai-kicker">ASYSTENT PRZEPISÓW</span>
-            <h3 id="aiHeading">Napisz, na co masz ochotę</h3>
-            <p>Opisz to zwykłymi słowami. AI ułoży kompletny przepis, wykorzysta produkty z najbliższym terminem i oznaczy składniki do dokupienia.</p>
-          </div>
-          <label class="field-label" for="aiPreferences">Jakiego przepisu szukasz?</label>
-          <textarea id="aiPreferences" name="preferences" maxlength="500" rows="3" placeholder="np. Napisz przepis na łagodny obiad z kurczakiem i marchewką, dla 2 osób, do 30 minut."></textarea>
-          <div class="ai-actions">
-            <button type="submit" class="primary-btn" id="aiSubmit">Napisz przepis</button>
-            <span>Limit: 5 zapytań / 15 min i 25 / dobę na adres IP; 300 / dobę łącznie.</span>
-          </div>
-          <p class="ai-privacy">Asystent tworzy przepis na podstawie Twojego opisu i produktów — nie przeszukuje stron internetowych. Do OpenRouter wysyłamy tylko nazwy i daty produktów oraz opis; nie wysyłamy notatek ani historii rozmów. Nie wpisuj danych osobowych.</p>
-          <div id="aiResult" class="ai-result hidden" role="status" aria-live="polite"></div>
-        </form>
-        <div id="recipeList" class="recipe-list" role="list" aria-label="Przepisy dopasowane do Twoich produktów" aria-live="polite"></div>
-        <div id="recipeEmpty" class="empty-state recipe-empty hidden">
-          <div class="empty-illustration" aria-hidden="true">🍳</div>
-          <h3 id="recipeEmptyTitle">Nie ma jeszcze pasujących przepisów</h3>
-          <p id="recipeEmptyText">Dodaj produkty, a podpowiemy, co możesz z nich przygotować.</p>
-          <button type="button" class="primary-btn" id="recipeEmptyAdd">＋ Dodaj produkt</button>
-        </div>
-        <p class="recipe-disclaimer">Podpowiedzi bazują na nazwach produktów i nie sprawdzają ich stanu. Nie używaj produktów po terminie ani takich, które budzą wątpliwości.</p>
       </section>
       <footer class="main-footer"><span>FreshTrack <span class="dot">●</span> mniej marnowania, więcej smaku</span><button id="exportBtn" class="text-btn">Eksportuj dane ↗</button></footer>
     </main>
@@ -125,11 +90,7 @@
       <label class="field-label" for="productName">Nazwa produktu *</label>
       <input id="productName" name="name" required maxlength="80" placeholder="np. Jogurt naturalny">
       <div class="form-row">
-        <div>
-          <label class="field-label" for="productDate">Data ważności *</label>
-          <input id="productDate" name="date" type="date" required aria-describedby="dateHelp">
-          <p class="field-help" id="dateHelp">Produkty z terminem dziś lub w ciągu 3 dni wyróżnimy na liście.</p>
-        </div>
+        <div><label class="field-label" for="productDate">Data ważności *</label><input id="productDate" name="date" type="date" required></div>
         <div><label class="field-label" for="productQty">Ilość</label><input id="productQty" name="qty" type="number" min="1" max="999" value="1" required></div>
       </div>
       <label class="field-label" for="productCategory">Kategoria</label>
