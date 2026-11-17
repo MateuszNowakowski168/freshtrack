@@ -111,7 +111,7 @@ export async function getChatReply(payload, apiKey, fetchImplementation = fetch)
         ...payload.messages
       ]
     }),
-    signal: AbortSignal.timeout(20_000)
+    signal: AbortSignal.timeout(45_000)
   });
 
   if (!response.ok) {

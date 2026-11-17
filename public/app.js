@@ -236,10 +236,11 @@ $("chatForm").addEventListener("submit", async event => {
         items: availableProducts().map(({ name, date, qty }) => ({ name, date, qty })),
         messages: recentChatMessages()
       }),
-      signal: AbortSignal.timeout(30_000)
+      signal: AbortSignal.timeout(60_000)
     });
     if (response.status === 429) throw new Error("Osiągnięto limit wiadomości. Spróbuj ponownie później.");
     if (response.status === 503) throw new Error("Asystent AI nie jest teraz skonfigurowany. Spróbuj ponownie później.");
+    if (response.status === 504) throw new Error("Asystent potrzebuje więcej czasu. Spróbuj ponownie za chwilę.");
     if (!response.ok) throw new Error("Nie udało się uzyskać odpowiedzi. Spróbuj ponownie za chwilę.");
     const result = await response.json();
     if (typeof result.reply !== "string" || !result.reply.trim()) {

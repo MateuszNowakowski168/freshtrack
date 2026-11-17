@@ -203,6 +203,25 @@ test("refuses a response from a paid model", async t => {
   assert.deepEqual(await response.json(), { error: "Chat service unavailable" });
 });
 
+test("reports an upstream timeout clearly", async t => {
+  const baseUrl = await startServer(t, {
+    environment: { AI_API_KEY: "test-secret" },
+    fetchImplementation: async () => {
+      const error = new Error("The operation was aborted due to timeout");
+      error.name = "TimeoutError";
+      throw error;
+    }
+  });
+  const response = await fetch(`${baseUrl}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(validPayload)
+  });
+
+  assert.equal(response.status, 504);
+  assert.deepEqual(await response.json(), { error: "Chat request timed out" });
+});
+
 test("shared OpenRouter client bounds output and rejects non-free models", async () => {
   const reply = await getChatReply(validPayload, "test-secret", async (url, options) => {
     assert.equal(url, "https://openrouter.ai/api/v1/chat/completions");

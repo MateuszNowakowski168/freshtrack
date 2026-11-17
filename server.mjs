@@ -164,7 +164,10 @@ export function createAppServer({
           return;
         }
         console.error("AI chat request failed:", error.message);
-        jsonResponse(response, 502, { error: "Chat service unavailable" });
+        const timedOut = error.name === "TimeoutError" || /timed out|timeout|operation was aborted/i.test(error.message);
+        jsonResponse(response, timedOut ? 504 : 502, {
+          error: timedOut ? "Chat request timed out" : "Chat service unavailable"
+        });
       }
       return;
     }
@@ -188,7 +191,7 @@ export function createAppServer({
       response.end("Nie można teraz wyświetlić strony.");
     }
   });
-  server.requestTimeout = 30_000;
+  server.requestTimeout = 65_000;
   server.headersTimeout = 15_000;
   server.maxHeadersCount = 50;
   return server;

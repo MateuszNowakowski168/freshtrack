@@ -133,6 +133,9 @@ async function handleChat(request, environment) {
     return jsonResponse(200, { reply });
   } catch (error) {
     console.error("OpenRouter chat request failed:", error.message);
+    if (error.name === "TimeoutError" || /timed out|timeout|operation was aborted/i.test(error.message)) {
+      return jsonResponse(504, { error: "Chat request timed out" });
+    }
     return jsonResponse(502, { error: "Chat service unavailable" });
   }
 }
