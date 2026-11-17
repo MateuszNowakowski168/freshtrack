@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#f5f7ef">
   <title>FreshTrack — mniej marnowania</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="assistant.css">
 </head>
 <body>
   <div class="app-shell">
@@ -15,10 +16,13 @@
         <span>fresh<span class="brand-light">track</span></span>
       </a>
       <div class="sidebar-label">MENU</div>
-      <button class="nav-item active" data-view="all"><span>▦</span> Wszystkie produkty <span class="nav-count" id="navAllCount">0</span></button>
-      <button class="nav-item" data-view="soon"><span>◷</span> Do zużycia wkrótce</button>
-      <button class="nav-item" data-view="expired"><span>!</span> Po terminie</button>
-      <button class="nav-item" data-view="used"><span>✓</span> Zużyte produkty</button>
+      <nav class="sidebar-nav" aria-label="Nawigacja główna">
+        <button class="nav-item active" data-view="all"><span>▦</span> Wszystkie produkty <span class="nav-count" id="navAllCount">0</span></button>
+        <button class="nav-item" data-view="soon"><span>◷</span> Do zużycia wkrótce</button>
+        <button class="nav-item" data-view="expired"><span>!</span> Po terminie</button>
+        <button class="nav-item" data-view="used"><span>✓</span> Zużyte produkty</button>
+        <button class="nav-item" data-view="assistant"><span>✦</span> Asystent kulinarny</button>
+      </nav>
       <div class="sidebar-bottom">
         <div class="tip-icon">♧</div>
         <strong>Dobre nawyki, małe zmiany</strong>
@@ -39,6 +43,30 @@
         <button class="primary-btn" id="openAdd"><span class="plus">＋</span> Dodaj produkt</button>
       </header>
 
+      <section id="assistantPanel" class="assistant-panel hidden" aria-labelledby="assistantHeading">
+        <div class="assistant-intro">
+          <div class="assistant-mark" aria-hidden="true">✦</div>
+          <div>
+            <h2 id="assistantHeading">Porozmawiajmy o jedzeniu</h2>
+            <p>Poproś o przepis, pomysł na obiad albo zamiennik składnika. Asystent uwzględni Twoją spiżarnię.</p>
+          </div>
+          <button type="button" class="secondary-btn new-chat-btn" id="clearChat">Nowa rozmowa</button>
+        </div>
+        <p class="chat-context" id="chatContext" aria-live="polite"></p>
+        <div class="chat-messages" id="chatMessages" role="log" aria-label="Historia rozmowy" aria-live="polite" aria-relevant="additions"></div>
+        <form class="chat-form" id="chatForm">
+          <label class="sr-only" for="chatInput">Wiadomość do asystenta kulinarnego</label>
+          <textarea id="chatInput" name="message" rows="3" maxlength="1200" placeholder="Np. Co mogę zrobić z jogurtu i warzyw?"></textarea>
+          <div class="chat-form-bottom">
+            <span>Do 1200 znaków</span>
+            <button type="submit" class="primary-btn" id="chatSubmit">Wyślij <span aria-hidden="true">→</span></button>
+          </div>
+        </form>
+        <p class="chat-status" id="chatStatus" role="status" aria-live="polite"></p>
+        <p class="chat-privacy" id="chatPrivacy">Model AI jest darmowy, ale nie przeszukuje internetu. Do OpenRouter wysyłamy nazwy, ilości i terminy produktów z terminem dziś lub później oraz maksymalnie 8 ostatnich wiadomości. Notatki o produktach nie są wysyłane. Historia rozmowy jest przechowywana tylko w tej karcie przeglądarki.</p>
+      </section>
+
+      <div id="trackerContent">
       <section class="welcome-banner">
         <div class="welcome-copy">
           <div class="banner-kicker">MAŁE KROKI MAJĄ ZNACZENIE</div>
@@ -80,6 +108,7 @@
         </div>
       </section>
       <footer class="main-footer"><span>FreshTrack <span class="dot">●</span> mniej marnowania, więcej smaku</span><button id="exportBtn" class="text-btn">Eksportuj dane ↗</button></footer>
+      </div>
     </main>
   </div>
 

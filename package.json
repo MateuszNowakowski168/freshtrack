@@ -1,0 +1,19 @@
+{
+  "name": "freshtrack",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "dev:cloudflare": "wrangler dev",
+    "deploy:cloudflare": "wrangler deploy",
+    "secret:cloudflare": "wrangler secret put AI_API_KEY",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "wrangler": "^4.36.0"
+  }
+}

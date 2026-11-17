@@ -4,6 +4,7 @@ const $ = (id) => document.getElementById(id);
 let products = loadProducts();
 let currentView = "all";
 let toastTimer;
+let chatHistory = [];
 
 const categoryEmoji = {
   "Nabiał": "🥛", "Owoce i warzywa": "🥑", "Mięso i ryby": "🐟",
@@ -87,12 +88,24 @@ function render() {
   $("navAllCount").textContent = active.length;
   $("impactBar").style.width = `${Math.min(100, used * 10)}%`;
   $("impactText").textContent = used ? `Świetnie! Zużyto już ${used} ${used === 1 ? "produktu" : "produktów"}.` : "Oznacz produkt jako zużyty, by śledzić postępy.";
+  const isAssistant = currentView === "assistant";
+  $("trackerContent").classList.toggle("hidden", isAssistant);
+  $("assistantPanel").classList.toggle("hidden", !isAssistant);
+  $("openAdd").classList.toggle("hidden", isAssistant);
+  document.querySelectorAll(".nav-item").forEach(btn => btn.classList.toggle("active", btn.dataset.view === currentView));
+  updateChatContext();
+  if (isAssistant) {
+    $("pageTitle").textContent = "Asystent kulinarny";
+    $("pageSubtitle").textContent = "Pomysły i przepisy dopasowane do Twoich produktów.";
+    renderChatHistory();
+    return;
+  }
+
   const title = viewTitles[currentView];
   $("pageTitle").textContent = title[0];
   $("pageSubtitle").textContent = title[1];
   $("listHeading").textContent = title[2];
   $("listDescription").textContent = title[3];
-  document.querySelectorAll(".nav-item").forEach(btn => btn.classList.toggle("active", btn.dataset.view === currentView));
 
   const list = $("productList");
   const items = visibleProducts();
@@ -121,6 +134,58 @@ function showToast(message) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
 }
+function availableProducts() {
+  return products
+    .filter(product => !product.used && daysUntil(product.date) >= 0)
+    .sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name, "pl"))
+    .slice(0, 40);
+}
+function updateChatContext() {
+  const count = availableProducts().length;
+  $("chatContext").textContent = count
+    ? `Asystent uwzględni ${count} ${count === 1 ? "produkt" : count < 5 ? "produkty" : "produktów"} z terminem dziś lub później.`
+    : "Nie masz teraz produktów z aktualnym terminem — możesz poprosić o dowolny przepis.";
+}
+function renderChatHistory() {
+  const container = $("chatMessages");
+  if (!chatHistory.length) {
+    container.innerHTML = `<div class="chat-welcome"><span aria-hidden="true">🥗</span><strong>W czym mogę pomóc?</strong><p>Napisz, na co masz ochotę. Podpowiem danie z produktów w spiżarni albo zaproponuję brakujące składniki.</p></div>`;
+    return;
+  }
+
+  container.replaceChildren();
+  for (const message of chatHistory) {
+    const article = document.createElement("article");
+    article.className = `chat-message ${message.role === "user" ? "from-user" : "from-assistant"}`;
+    const label = document.createElement("span");
+    label.className = "chat-author";
+    label.textContent = message.role === "user" ? "Ty" : "Asystent FreshTrack";
+    const bubble = document.createElement("p");
+    bubble.className = "chat-bubble";
+    bubble.textContent = message.role === "assistant" ? plainAssistantText(message.content) : message.content;
+    article.append(label, bubble);
+    container.append(article);
+  }
+  container.scrollTop = container.scrollHeight;
+}
+function plainAssistantText(value) {
+  return value
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/^\s*[-*]\s+/gm, "• ");
+}
+function recentChatMessages() {
+  const selected = [];
+  let length = 0;
+  for (let index = chatHistory.length - 1; index >= 0 && selected.length < 8; index--) {
+    const message = chatHistory[index];
+    if (length + message.content.length > 15000) break;
+    selected.unshift(message);
+    length += message.content.length;
+  }
+  return selected;
+}
 function openDialog(product = null) {
   $("productForm").reset();
   $("productId").value = product?.id || "";
@@ -142,7 +207,69 @@ $("cancelModal").addEventListener("click", closeDialog);
 $("seeSoon").addEventListener("click", () => { currentView = "soon"; render(); document.querySelector(".products-section").scrollIntoView({ behavior: "smooth", block: "start" }); });
 $("searchInput").addEventListener("input", render);
 $("categoryFilter").addEventListener("change", render);
-document.querySelectorAll(".nav-item").forEach(btn => btn.addEventListener("click", () => { currentView = btn.dataset.view; render(); }));
+document.querySelectorAll(".nav-item").forEach(btn => btn.addEventListener("click", () => {
+  currentView = btn.dataset.view;
+  render();
+  if (currentView === "assistant") $("chatInput").focus();
+}));
+
+$("chatForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const content = $("chatInput").value.trim();
+  if (!content || content.length > 1200) return;
+
+  chatHistory.push({ role: "user", content });
+  chatHistory = chatHistory.slice(-20);
+  $("chatInput").value = "";
+  renderChatHistory();
+  $("chatStatus").classList.remove("error");
+  $("chatStatus").textContent = "Asystent przygotowuje odpowiedź…";
+  $("chatSubmit").disabled = true;
+  $("chatInput").disabled = true;
+  $("clearChat").disabled = true;
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: availableProducts().map(({ name, date, qty }) => ({ name, date, qty })),
+        messages: recentChatMessages()
+      }),
+      signal: AbortSignal.timeout(60_000)
+    });
+    if (response.status === 429) throw new Error("Osiągnięto limit wiadomości. Spróbuj ponownie później.");
+    if (response.status === 503) throw new Error("Asystent AI nie jest teraz skonfigurowany. Spróbuj ponownie później.");
+    if (response.status === 504) throw new Error("Asystent potrzebuje więcej czasu. Spróbuj ponownie za chwilę.");
+    if (!response.ok) throw new Error("Nie udało się uzyskać odpowiedzi. Spróbuj ponownie za chwilę.");
+    const result = await response.json();
+    if (typeof result.reply !== "string" || !result.reply.trim()) {
+      throw new Error("Asystent zwrócił pustą odpowiedź. Spróbuj ponownie.");
+    }
+    chatHistory.push({ role: "assistant", content: result.reply.trim().slice(0, 5000) });
+    chatHistory = chatHistory.slice(-20);
+    $("chatStatus").textContent = "";
+    renderChatHistory();
+  } catch (error) {
+    $("chatStatus").classList.add("error");
+    $("chatStatus").textContent = error.name === "TimeoutError"
+      ? "Odpowiedź trwała zbyt długo. Spróbuj ponownie."
+      : error.message || "Nie udało się połączyć z asystentem. Spróbuj ponownie.";
+  } finally {
+    $("chatSubmit").disabled = false;
+    $("chatInput").disabled = false;
+    $("clearChat").disabled = false;
+    $("chatInput").focus();
+  }
+});
+
+$("clearChat").addEventListener("click", () => {
+  chatHistory = [];
+  $("chatStatus").classList.remove("error");
+  $("chatStatus").textContent = "";
+  renderChatHistory();
+  $("chatInput").focus();
+});
 
 $("productForm").addEventListener("submit", event => {
   event.preventDefault();
