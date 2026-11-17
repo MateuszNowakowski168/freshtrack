@@ -10,6 +10,7 @@
     "start": "node server.mjs",
     "dev:cloudflare": "wrangler dev",
     "deploy:cloudflare": "wrangler deploy",
+    "secret:cloudflare": "wrangler secret put AI_API_KEY",
     "test": "node --test"
   },
   "devDependencies": {
