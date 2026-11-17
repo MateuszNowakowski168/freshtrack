@@ -162,11 +162,18 @@ function renderChatHistory() {
     label.textContent = message.role === "user" ? "Ty" : "Asystent FreshTrack";
     const bubble = document.createElement("p");
     bubble.className = "chat-bubble";
-    bubble.textContent = message.content;
+    bubble.textContent = message.role === "assistant" ? plainAssistantText(message.content) : message.content;
     article.append(label, bubble);
     container.append(article);
   }
   container.scrollTop = container.scrollHeight;
+}
+function plainAssistantText(value) {
+  return value
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/^\s*[-*]\s+/gm, "• ");
 }
 function recentChatMessages() {
   const selected = [];
